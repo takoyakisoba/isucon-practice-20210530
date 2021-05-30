@@ -19,7 +19,7 @@ services/start:
 	sudo supervisorctl start isucon-app
 	sudo systemctl start nginx
 
-bench: workload=1
+bench: workload=2
 bench: init=/home/isucon/qualifier_bench/init.sh
 bench:
 	sudo /home/isucon/qualifier_bench/bin/bench benchmark --workload ${workload} --init ${init}
