@@ -13,7 +13,8 @@ logs/truncate:
 	ssh app2 "sudo truncate --size 0 /var/log/isucon-app.log"
 
 app/build:
-	ssh app2 "cd /opt/isucon-practice-20210530/app && make build"
+	cd /opt/isucon-practice-20210530/app && make build
+	scp /opt/isucon-practice-20210530/app/src/app app2:/opt/isucon-practice-20210530/app/src/app
 
 services/start:
 	sudo systemctl start mysqld
