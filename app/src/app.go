@@ -19,6 +19,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -27,7 +28,7 @@ const (
 	sessionName        = "isucon_session"
 	tmpDir             = "/tmp/"
 	markdownCommand    = "../bin/markdown"
-	dbConnPoolSize     = 10
+	dbConnPoolSize     = 50
 	sessionSecret      = "kH<{11qpic*gf0e21YK7YtwyUvE9l<1r>yX8R-Op"
 )
 
@@ -129,6 +130,10 @@ func main() {
 		if err != nil {
 			log.Panicf("Error opening database: %v", err)
 		}
+		conn.SetMaxOpenConns(1)
+		conn.SetMaxIdleConns(1)
+		conn.SetConnMaxIdleTime(time.Minute)
+		conn.SetConnMaxLifetime(time.Minute)
 		dbConnPool <- conn
 		defer conn.Close()
 	}
