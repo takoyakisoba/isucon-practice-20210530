@@ -130,9 +130,7 @@ func main() {
 		if err != nil {
 			log.Panicf("Error opening database: %v", err)
 		}
-		conn.SetMaxOpenConns(1)
 		conn.SetMaxIdleConns(1)
-		conn.SetConnMaxLifetime(time.Minute)
 		dbConnPool <- conn
 		defer conn.Close()
 	}
