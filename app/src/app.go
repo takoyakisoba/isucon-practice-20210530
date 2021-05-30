@@ -241,7 +241,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as minner join users as u on u.id = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ?", memosPerPage)
+	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as m inner join users as u on u.id = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ?", memosPerPage)
 	if err != nil {
 		serverError(w, err)
 		return
