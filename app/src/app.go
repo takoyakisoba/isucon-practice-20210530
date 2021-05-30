@@ -481,7 +481,7 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 	user := getUser(w, r, dbConn, session)
 
-	rows, err := dbConn.Query("SELECT id, user, content, is_private, created_at, updated_at FROM memos WHERE id=?", memoId)
+	rows, err := dbConn.Query("SELECT m.id, m.user, m.content, m.is_private, m.created_at, m.updated_at, u.username FROM memos as m inner join users as u on u.id = m.user WHERE m.id=?", memoId)
 	if err != nil {
 		serverError(w, err)
 		return
@@ -499,15 +499,6 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 			notFound(w)
 			return
 		}
-	}
-	rows, err = dbConn.Query("SELECT username FROM users WHERE id=?", memo.User)
-	if err != nil {
-		serverError(w, err)
-		return
-	}
-	if rows.Next() {
-		rows.Scan(&memo.Username)
-		rows.Close()
 	}
 
 	var cond string
