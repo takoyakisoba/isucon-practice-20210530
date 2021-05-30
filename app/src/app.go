@@ -241,22 +241,15 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("select m.* from memos as m inner join (select memo_id from public_memos order by created_at desc, memo_id desc limit ?) as t on t.memo_id = m.id;", memosPerPage)
+	rows, err = dbConn.Query("select m.*, u.username from memos as m inner join (select memo_id from public_memos order by created_at desc, memo_id desc limit ?) as t on t.memo_id = m.id inner join users as u on u.id = m.user;", memosPerPage)
 	if err != nil {
 		serverError(w, err)
 		return
 	}
 	memos := make(Memos, 0)
-	stmtUser, err := dbConn.Prepare("SELECT username FROM users WHERE id=?")
-	defer stmtUser.Close()
-	if err != nil {
-		serverError(w, err)
-		return
-	}
 	for rows.Next() {
 		memo := Memo{}
-		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt)
-		stmtUser.QueryRow(memo.User).Scan(&memo.Username)
+		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt, &memo.Username)
 		memos = append(memos, &memo)
 	}
 	rows.Close()
@@ -301,22 +294,15 @@ func recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("select m.* from memos as m inner join (select memo_id from public_memos order by created_at desc, memo_id desc limit ? offset ?) as t on t.memo_id = m.id;", memosPerPage, memosPerPage*page)
+	rows, err = dbConn.Query("select m.*, u.username from memos as m inner join (select memo_id from public_memos order by created_at desc, memo_id desc limit ? offset ?) as t on t.memo_id = m.id inner join users as u on u.id = m.user;", memosPerPage, memosPerPage*page)
 	if err != nil {
 		serverError(w, err)
 		return
 	}
 	memos := make(Memos, 0)
-	stmtUser, err := dbConn.Prepare("SELECT username FROM users WHERE id=?")
-	defer stmtUser.Close()
-	if err != nil {
-		serverError(w, err)
-		return
-	}
 	for rows.Next() {
 		memo := Memo{}
-		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt)
-		stmtUser.QueryRow(memo.User).Scan(&memo.Username)
+		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt, &memo.Username)
 		memos = append(memos, &memo)
 	}
 	if len(memos) == 0 {
@@ -481,14 +467,14 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 	user := getUser(w, r, dbConn, session)
 
-	rows, err := dbConn.Query("SELECT id, user, content, is_private, created_at, updated_at FROM memos WHERE id=?", memoId)
+	rows, err := dbConn.Query("SELECT m.id, m.user, m.content, m.is_private, m.created_at, m.updated_at, u.username FROM memos as m inner join users as u on u.id = m.user WHERE m.id=?", memoId)
 	if err != nil {
 		serverError(w, err)
 		return
 	}
 	memo := &Memo{}
 	if rows.Next() {
-		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt)
+		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt, &memo.Username)
 		rows.Close()
 	} else {
 		notFound(w)
@@ -499,15 +485,6 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 			notFound(w)
 			return
 		}
-	}
-	rows, err = dbConn.Query("SELECT username FROM users WHERE id=?", memo.User)
-	if err != nil {
-		serverError(w, err)
-		return
-	}
-	if rows.Next() {
-		rows.Scan(&memo.Username)
-		rows.Close()
 	}
 
 	var cond string
