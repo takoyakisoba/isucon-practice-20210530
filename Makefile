@@ -3,20 +3,21 @@ gogo: services/stop logs/truncate app/build services/start bench
 
 services/stop:
 	sudo systemctl stop nginx
-	sudo supervisorctl stop isucon-app
+	ssh app2 "sudo supervisorctl stop isucon-app"
 	sudo systemctl stop mysqld
 
 logs/truncate:
 	sudo truncate --size 0 /var/log/nginx/access.log
 	sudo truncate --size 0 /var/log/nginx/error.log
 	sudo truncate --size 0 /var/lib/mysql/mysql-slow.log
+	ssh app2 "sudo truncate --size 0 /var/log/isucon-app.log"
 
 app/build:
-	cd app && make build
+	ssh app2 "cd /opt/isucon-practice-20210530/app && make build"
 
 services/start:
 	sudo systemctl start mysqld
-	sudo supervisorctl start isucon-app
+	ssh app2 "sudo supervisorctl start isucon-app"
 	sudo systemctl start nginx
 
 bench: workload=2
