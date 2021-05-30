@@ -26,7 +26,7 @@ bench:
 	sudo /home/isucon/qualifier_bench/bin/bench benchmark --workload ${workload} --init ${init}
 
 kataribe:
-	sudo cat /var/log/nginx/access.log | kataribe
+	sudo cat /var/log/nginx/access.log | kataribe -conf kataribe.toml
 
 
 # 開発用
