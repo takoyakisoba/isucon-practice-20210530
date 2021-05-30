@@ -21,7 +21,7 @@ services/start:
 	ssh app2 "sudo supervisorctl start isucon-app"
 	sudo systemctl start nginx
 
-bench: workload=2
+bench: workload=3
 bench: init=/home/isucon/qualifier_bench/init.sh
 bench:
 	sudo /home/isucon/qualifier_bench/bin/bench benchmark --workload ${workload} --init ${init}
