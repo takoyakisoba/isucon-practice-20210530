@@ -488,7 +488,7 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	memo := &Memo{}
 	if rows.Next() {
-		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt)
+		rows.Scan(&memo.Id, &memo.User, &memo.Content, &memo.IsPrivate, &memo.CreatedAt, &memo.UpdatedAt, &memo.Username)
 		rows.Close()
 	} else {
 		notFound(w)
