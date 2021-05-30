@@ -301,7 +301,7 @@ func recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("SELECT m.* FROM public_memos as pm inner join memos as m on pm.memo_id = m.id ORDER BY pm.created_at DESC, pm.memo_id DESC LIMIT ? OFFSET ?", memosPerPage, memosPerPage*page)
+	rows, err = dbConn.Query("select m.* from memos as m inner join (select memo_id from public_memos order by created_at desc, memo_id desc limit ? offset ?) as t on t.memo_id = m.id;", memosPerPage, memosPerPage*page)
 	if err != nil {
 		serverError(w, err)
 		return
