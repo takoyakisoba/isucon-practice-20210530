@@ -27,7 +27,7 @@ const (
 	sessionName        = "isucon_session"
 	tmpDir             = "/tmp/"
 	markdownCommand    = "../bin/markdown"
-	dbConnPoolSize     = 10
+	dbConnPoolSize     = 50
 	sessionSecret      = "kH<{11qpic*gf0e21YK7YtwyUvE9l<1r>yX8R-Op"
 )
 
@@ -118,7 +118,7 @@ func main() {
 	config := loadConfig("../config/" + env + ".json")
 	db := config.Database
 	connectionString := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8&interpolateParams=true",
 		db.Username, db.Password, db.Host, db.Port, db.Dbname,
 	)
 	log.Printf("db: %s", connectionString)
@@ -129,6 +129,7 @@ func main() {
 		if err != nil {
 			log.Panicf("Error opening database: %v", err)
 		}
+		conn.SetMaxIdleConns(1)
 		dbConnPool <- conn
 		defer conn.Close()
 	}
