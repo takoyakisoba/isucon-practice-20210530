@@ -241,7 +241,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as minner join users as u on u.od = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ?", memosPerPage)
+	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as minner join users as u on u.id = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ?", memosPerPage)
 	if err != nil {
 		serverError(w, err)
 		return
@@ -294,7 +294,7 @@ func recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rows.Close()
 
-	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as m inner join users as u on u.od = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ? OFFSET ?", memosPerPage, memosPerPage*page)
+	rows, err = dbConn.Query("SELECT m.*, u.username FROM memos as m inner join users as u on u.id = m.user WHERE m.is_private=0 ORDER BY m.created_at DESC, m.id DESC LIMIT ? OFFSET ?", memosPerPage, memosPerPage*page)
 	if err != nil {
 		serverError(w, err)
 		return
@@ -467,7 +467,7 @@ func memoHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 	user := getUser(w, r, dbConn, session)
 
-	rows, err := dbConn.Query("SELECT m.id, m.user, m.content, m.is_private, m.created_at, m.updated_at, u.username FROM memos as m inner join users as u on u.od = m.user WHERE m.id=?", memoId)
+	rows, err := dbConn.Query("SELECT m.id, m.user, m.content, m.is_private, m.created_at, m.updated_at, u.username FROM memos as m inner join users as u on u.id = m.user WHERE m.id=?", memoId)
 	if err != nil {
 		serverError(w, err)
 		return
