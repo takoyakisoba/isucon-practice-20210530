@@ -132,7 +132,6 @@ func main() {
 		}
 		conn.SetMaxOpenConns(1)
 		conn.SetMaxIdleConns(1)
-		conn.SetConnMaxIdleTime(time.Minute)
 		conn.SetConnMaxLifetime(time.Minute)
 		dbConnPool <- conn
 		defer conn.Close()
